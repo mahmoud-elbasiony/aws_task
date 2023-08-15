@@ -9,20 +9,22 @@ from django.conf import settings
 class ObjectsView(generics.GenericAPIView):
     authentication_classes=[]
     permission_classes=[]
-    client = boto3.client(
-            's3',
-            aws_access_key_id=settings.ACCESS_KEY,
-            aws_secret_access_key=settings.SECRET_ACCESS_KEY,
-
-            )
+    
 
     
-    def get(self, request,bucket):
+    def post(self, request,bucket):
         
+        response={}
         
         try:
-            response={}
-            list_objects = self.client.list_objects(
+            print(request.data)
+
+            client = boto3.client(
+            's3',
+                aws_access_key_id=request.data.get("accessId"),
+                aws_secret_access_key=request.data.get("secretAccessId"),
+            )
+            list_objects = client.list_objects(
                 Bucket=bucket,
             )
             temp_list_objects=[]
@@ -32,7 +34,7 @@ class ObjectsView(generics.GenericAPIView):
                     temp_object={}
                     print(f'    object {object["Key"]}')
                     temp_object["Key"]=object["Key"]
-                    acl= self.client.get_object_acl(
+                    acl= client.get_object_acl(
                                 Bucket=bucket,
                                 Key=object["Key"],
                             )
