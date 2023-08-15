@@ -10,9 +10,14 @@ class Buckets extends Component{
             credential:{
                 accessId:"",
                 secretAccessId:"",
+                
             },
             allBuckets:[],
-            loading:false
+            loading:false,
+            errors:{
+                status:false,
+                msg:""
+            }
         }
     }
     getAccessId=(e)=>{
@@ -30,6 +35,7 @@ class Buckets extends Component{
         })
 
     }
+
     submit=(e)=>{
         if(this.getAccessId.length>0 && this.getSecretAccessId.length>0){
             this.getData()
@@ -46,10 +52,18 @@ class Buckets extends Component{
         })
         .then((res)=>res.json())
         .then((res)=>{
+            if(res.error){
+                throw new Error(res.error);
+            }
             this.setState({allBuckets:res.buckets})
+            this.setState({errors:{status:false,msg:this.state.errors.msg}})
             console.log(res)
+            
         })
-        .catch((err)=>{console.log(err)})
+        .catch((err)=>{
+            console.log(err)
+            this.setState({errors:{status:true,msg:err.toString()}})
+        })
     }
     componentDidMount(){
         
@@ -113,10 +127,27 @@ class Buckets extends Component{
                         <label htmlFor="accessId"  className="form-label">Access Id</label>
                         <input type="password" onChange={this.getAccessId} className="form-control" id="accessId" />
                     </div>
+                    
                     <div className="mb-3">
+                    
                         <label htmlFor="secretAccessId" className="form-label" >Secret Access Id</label>
-                        <input type="password" onChange={this.getSecretAccessId} className="form-control" id="secretAccessId"/>
+                        <input type="password" onChange={this.getSecretAccessId} className={`form-control`} id="secretAccessId"/>
+                        {this.state.errors.status?(
+                            <div className="text-danger fs-6">
+                                {this.state.errors.msg}
+                            </div>
+                            ):(!!this.state.errors.msg?(
+                                <div className="text-success fs-6">
+                                    every thing looks good.
+                                </div>
+                            )
+                            :("")
+                        )}
                     </div>
+                    {"msg: "+!!this.state.errors.msg}
+                    <br/>
+                    {"status: "+this.state.errors.status}
+                    <br/>
                     <button type="submit" className="btn btn-dark px-4" onClick={this.submit}>Submit</button>
                 </div>
                 </div>
