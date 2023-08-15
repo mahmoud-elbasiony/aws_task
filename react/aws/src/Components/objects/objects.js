@@ -1,15 +1,22 @@
-import { NavLink } from "react-router-dom";
+
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
+import { useOutletContext } from "react-router-dom";
 
 let Objects=()=>{
-
+    let credential=useOutletContext()
+    console.log(credential)
     let {bucket} = useParams();
     let [objects,setObjects]=useState([])
     useEffect(()=>{
         
-        fetch(`http://localhost:8000/aws/objects/${bucket}`)
+        fetch(`http://localhost:8000/aws/objects/${bucket}`,{
+            method:"POST",
+            body:JSON.stringify(credential),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
         .then((res)=>res.json())
         .then((res)=>{
             console.log(res.objects)
