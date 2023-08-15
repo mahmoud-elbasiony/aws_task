@@ -44,6 +44,9 @@ class ObjectsView(generics.GenericAPIView):
                     temp_list_objects.append(temp_object)
         except Exception as e:
             print(f'Exception: {e}')
+            return Response({
+            "error":f'{e}',
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             
         return Response({
